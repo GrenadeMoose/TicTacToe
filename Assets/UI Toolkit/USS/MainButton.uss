@@ -1,0 +1,10 @@
+.button {
+    -unity-font-style: bold;
+    -unity-font: url("project://database/Assets/UI%20Toolkit/Fonts/Roboto-Black.ttf?fileID=12800000&guid=f5f17ecf9142f5e4eafd9e7f430cec29&type=3#Roboto-Black");
+    font-size: 18px;
+    width: 100px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
