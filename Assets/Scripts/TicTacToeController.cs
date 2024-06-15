@@ -1,12 +1,10 @@
-using System;
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
-using UnityEngine.VFX;
+
 
 /// <summary>
 /// The tic tac toe controller is responsible for managing all spaces of the board.
@@ -19,12 +17,13 @@ public class TicTacToeController : MonoBehaviour
     public bool IsXTurn { get; private set; }
     public List<GameObject> AvailableSpaces { get; private set; }
 
+    public int MinToWin { get; private set; } = 3;
 
     public GameObject TicTacToeParent;
     [SerializeField] private GameObject buttonPrefab;
     [SerializeField] private int rowCount = 3;
     [SerializeField] private int colCount = 3;
-    [SerializeField] private int minToWin = 3;
+    
     [SerializeField] private Texture2D[] boardTextures;
 
 
@@ -55,11 +54,12 @@ public class TicTacToeController : MonoBehaviour
     void Start()
     {
         AvailableSpaces = new List<GameObject>();
+        IsXTurn = true;
         InitializeBoard();
     }
 
     /// <summary>
-    /// Initialize the board. Create buttons from prefabs at specified locations
+    /// Initialize the board. Create board spaces at specified locations
     /// </summary>
     private void InitializeBoard()
     { 
@@ -79,21 +79,62 @@ public class TicTacToeController : MonoBehaviour
         {
             for (int col = 0; col < colCount; col++)
             {
-                GameObject newButton  = Instantiate(buttonPrefab, parentTransform);
+                GameObject newSpace = CreateSpace(row, col, buttonSize, parentTransform);
 
-                RectTransform buttonTransform = newButton.GetComponent<RectTransform>();
-                buttonTransform.anchorMin = new Vector2(0.0f, 1.0f);
-                buttonTransform.anchorMax = new Vector2(0.0f, 1.0f);
-                buttonTransform.sizeDelta = new Vector2(buttonSize, buttonSize);
-                buttonTransform.anchoredPosition = new Vector2(buttonSize * col - (buttonSize * (float)rowCount)/2.0f, -buttonSize * row - buttonSize/2);
-
-                newButton.name = "Button_" + row.ToString() + "_" + col.ToString();
-
-                AssignBoardTextures(newButton, row, col);
-
-                availableSpaces.Add(newButton);
+                AvailableSpaces.Add(newSpace);
             }
         }
+    }
+    
+    /// <summary>
+    /// Create a new board space using the specified prefab at the location Row, Col.
+    /// Then assign neighbors to that space.
+    /// </summary>
+    /// <param name="row">Current row</param>
+    /// <param name="col">Current colum</param>
+    /// <param name="buttonSize">Size of each space</param>
+    /// <param name="parentTransform">Transform of the parent UI object</param>
+    /// <returns>The newly created button Game Object</returns>
+    private GameObject CreateSpace(int row, int col, float buttonSize, RectTransform parentTransform)
+    {
+        GameObject res = Instantiate(buttonPrefab, parentTransform);
+
+        RectTransform buttonTransform = res.GetComponent<RectTransform>();
+        buttonTransform.anchorMin = new Vector2(0.0f, 1.0f);
+        buttonTransform.anchorMax = new Vector2(0.0f, 1.0f);
+        buttonTransform.sizeDelta = new Vector2(buttonSize, buttonSize);
+        buttonTransform.anchoredPosition = new Vector2(buttonSize * col - (buttonSize * (float)rowCount) / 2.0f, -buttonSize * row - buttonSize / 2);
+
+        res.name = "Button_" + row.ToString() + "_" + col.ToString();
+
+        AssignBoardTextures(res, row, col);
+
+        // Assigning Left, Upper Left, Upper, and Upper Right neighbors should cover all neighboring spaces.
+        if (col > 0)
+        {
+            res.GetComponent<BoardSpace>().AssignNeighbor(AvailableSpaces.Last<GameObject>().GetComponent<BoardSpace>(), NeighboringSpace.DirectionEnum.Left);
+            Debug.Log(res.GetComponent<BoardSpace>().Neighbors.Count);
+
+        }
+        if (row > 0)
+        {
+            if (col > 0)
+            {
+                int upperLeftIndex = AvailableSpaces.Count - colCount - 1;
+                res.GetComponent<BoardSpace>().AssignNeighbor(AvailableSpaces[upperLeftIndex].GetComponent<BoardSpace>(), NeighboringSpace.DirectionEnum.UpperLeft);
+                Debug.Log(res.GetComponent<BoardSpace>().Neighbors.Count);
+            }
+            int topIndex = AvailableSpaces.Count - colCount;
+            res.GetComponent<BoardSpace>().AssignNeighbor(AvailableSpaces[topIndex].GetComponent<BoardSpace>(), NeighboringSpace.DirectionEnum.Top);
+            Debug.Log(res.GetComponent<BoardSpace>().Neighbors.Count);
+            if (col < colCount - 1)
+            {
+                int upperRightIndex = AvailableSpaces.Count - colCount + 1;
+                res.GetComponent<BoardSpace>().AssignNeighbor(AvailableSpaces[upperRightIndex].GetComponent<BoardSpace>(), NeighboringSpace.DirectionEnum.UpperRight);
+                Debug.Log(res.GetComponent<BoardSpace>().Neighbors.Count);
+            }
+        }
+        return res;
     }
 
     /// <summary>
@@ -161,7 +202,6 @@ public class TicTacToeController : MonoBehaviour
     public bool ClaimSpace(GameObject button)
     {
         Debug.Log("Claiming Space " + button.name);
-        Assert.IsFalse(AvailableSpaces.Contains(button), "This space has already been claimed!");
         if (AvailableSpaces.Contains(button))
         {
             AvailableSpaces.Remove(button);
@@ -176,6 +216,17 @@ public class TicTacToeController : MonoBehaviour
     public void EndTurn()
     {
         IsXTurn = !IsXTurn;
+
+        if (AvailableSpaces.Count == 0)
+        {
+            DrawGame();
+            return;
+        }
+
+        if (!IsXTurn && !Multiplayer)
+        {
+            StartCoroutine(ComputerTurn());
+        }
     }
 
     /// <summary>
@@ -186,4 +237,26 @@ public class TicTacToeController : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// There are no winners, and there are no available spaces
+    /// </summary>
+    public void DrawGame()
+    {
+        Debug.Log("The game is a draw. There are no available spaces left");
+    }
+
+    /// <summary>
+    /// The computer's turn logic
+    /// </summary>
+    IEnumerator ComputerTurn()
+    {
+        Debug.Log("Computer thinking");
+        // Simulate computer thinking
+        float seconds = Random.Range(0.5f, 2.0f);
+        yield return new WaitForSeconds(seconds);
+ 
+        // Claim computer space
+        int space = Random.Range(0, AvailableSpaces.Count - 1);
+        AvailableSpaces[space].GetComponent<BoardSpace>().TryClaimSpace();
+    }
 }
