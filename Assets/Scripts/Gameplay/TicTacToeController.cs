@@ -95,10 +95,10 @@ public class TicTacToeController : MonoBehaviour
         GameObject res = Instantiate(buttonPrefab, parentTransform);
 
         RectTransform buttonTransform = res.GetComponent<RectTransform>();
-        buttonTransform.anchorMin = new Vector2(0.0f, 1.0f);
-        buttonTransform.anchorMax = new Vector2(0.0f, 1.0f);
+        buttonTransform.anchorMin = new Vector2(0.5f, 1.0f);
+        buttonTransform.anchorMax = new Vector2(0.5f, 1.0f);
         buttonTransform.sizeDelta = new Vector2(buttonSize, buttonSize);
-        buttonTransform.anchoredPosition = new Vector2(buttonSize * col - (buttonSize * (float)rowCount) / 2.0f, -buttonSize * row - buttonSize / 2);
+        buttonTransform.anchoredPosition = new Vector2(buttonSize * col - (buttonSize * (float)rowCount) / 2.0f + (0.5f * buttonSize), -buttonSize * row - buttonSize / 2);
 
         res.name = "Button_" + row.ToString() + "_" + col.ToString();
 
