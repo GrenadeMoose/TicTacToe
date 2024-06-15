@@ -1,15 +1,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.VFX;
 
+/// <summary>
+/// The tic tac toe controller is responsible for managing all spaces of the board.
+/// </summary>
 public class TicTacToeController : MonoBehaviour
 {
-    public bool multiplayer;
+    public static TicTacToeController Instance { get; private set; }
+
+    public bool Multiplayer;
+    public bool IsXTurn { get; private set; }
+    public List<GameObject> AvailableSpaces { get; private set; }
+
 
     public GameObject TicTacToeParent;
     [SerializeField] private GameObject buttonPrefab;
@@ -18,7 +27,6 @@ public class TicTacToeController : MonoBehaviour
     [SerializeField] private int minToWin = 3;
     [SerializeField] private Texture2D[] boardTextures;
 
-    private List<GameObject> availableSpaces;
 
 
     /*************************************************************************
@@ -26,18 +34,34 @@ public class TicTacToeController : MonoBehaviour
      *************************************************************************/
 
     /// <summary>
+    /// Determine if we are the only copy of the controller
+    /// Destroy this instance if another already exists.
+    /// </summary>
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
+
+    /// <summary>
     /// Start
     /// </summary>
     void Start()
     {
-        availableSpaces = new List<GameObject>();
+        AvailableSpaces = new List<GameObject>();
         InitializeBoard();
     }
 
     /// <summary>
     /// Initialize the board. Create buttons from prefabs at specified locations
     /// </summary>
-    void InitializeBoard()
+    private void InitializeBoard()
     { 
         RectTransform parentTransform = TicTacToeParent.GetComponent<RectTransform>();
 
@@ -78,7 +102,7 @@ public class TicTacToeController : MonoBehaviour
     /// <param name="button"></param>
     /// <param name="row"></param>
     /// <param name="col"></param>
-    void AssignBoardTextures(GameObject button, int row, int col)
+    private void AssignBoardTextures(GameObject button, int row, int col)
     {
         if (row == 0)
         {
@@ -133,18 +157,25 @@ public class TicTacToeController : MonoBehaviour
     /// Claiming a space by removing the used space from the available spaces pool
     /// </summary>
     /// <param name="button"> The space to be claimed by a player </param>
-    public void ClaimSpace(GameObject button)
+    /// <returns> True on success, false on failure </returns>
+    public bool ClaimSpace(GameObject button)
     {
-        Assert.IsFalse(availableSpaces.Contains(button), "This space has already been claimed!");
-        availableSpaces.Remove(button);
+        Debug.Log("Claiming Space " + button.name);
+        Assert.IsFalse(AvailableSpaces.Contains(button), "This space has already been claimed!");
+        if (AvailableSpaces.Contains(button))
+        {
+            AvailableSpaces.Remove(button);
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
-    /// Keeping track of who's turn it is. 
+    /// End a turn and update the turn tracker 
     /// </summary>
-    public void TurnTracker()
+    public void EndTurn()
     {
-
+        IsXTurn = !IsXTurn;
     }
 
     /// <summary>
