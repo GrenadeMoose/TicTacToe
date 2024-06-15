@@ -50,8 +50,12 @@ public class BoardSpace : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Try to claim a space from the controller.
+    /// If the space is available, check for a win condition.
+    /// </summary>
     public void TryClaimSpace() {
-        Debug.Log("Hello I have been clicked " + gameObject.name);
         if (TicTacToeController.Instance.AvailableSpaces.Contains(this.gameObject))
         {
             bool success = TicTacToeController.Instance.ClaimSpace(this.gameObject);
