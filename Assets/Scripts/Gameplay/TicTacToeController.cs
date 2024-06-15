@@ -1,8 +1,8 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
@@ -15,11 +15,11 @@ public class TicTacToeController : MonoBehaviour
 
     public bool Multiplayer;
     public bool IsXTurn { get; private set; }
+    public bool Winner { get; private set; }
     public List<GameObject> AvailableSpaces { get; private set; }
 
-    public int MinToWin { get; private set; } = 3;
+    [field: SerializeField] public int MinToWin { get; private set; } = 3;
 
-    public GameObject TicTacToeParent;
     [SerializeField] private GameObject buttonPrefab;
     [SerializeField] private int rowCount = 3;
     [SerializeField] private int colCount = 3;
@@ -44,25 +44,20 @@ public class TicTacToeController : MonoBehaviour
         }
         else
         {
-            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            Instance = this; 
         }
-    }
-
-    /// <summary>
-    /// Start
-    /// </summary>
-    void Start()
-    {
-        AvailableSpaces = new List<GameObject>();
-        IsXTurn = true;
-        InitializeBoard();
     }
 
     /// <summary>
     /// Initialize the board. Create board spaces at specified locations
     /// </summary>
-    private void InitializeBoard()
-    { 
+    public void InitializeBoard(GameObject TicTacToeParent)
+    {
+        Winner = false;
+        AvailableSpaces = new List<GameObject>();
+        IsXTurn = true;
+
         RectTransform parentTransform = TicTacToeParent.GetComponent<RectTransform>();
 
         Vector2 canvasSize = parentTransform.GetComponentInParent<Canvas>().GetComponent<RectTransform>().sizeDelta;
@@ -201,7 +196,8 @@ public class TicTacToeController : MonoBehaviour
     /// <returns> True on success, false on failure </returns>
     public bool ClaimSpace(GameObject button)
     {
-        Debug.Log("Claiming Space " + button.name);
+        if (Winner) return false;
+
         if (AvailableSpaces.Contains(button))
         {
             AvailableSpaces.Remove(button);
@@ -234,7 +230,8 @@ public class TicTacToeController : MonoBehaviour
     /// </summary>
     public void WinConditionAchieved()
     {
-
+        Winner = true;
+        StartCoroutine(EndGame());
     }
 
     /// <summary>
@@ -242,7 +239,16 @@ public class TicTacToeController : MonoBehaviour
     /// </summary>
     public void DrawGame()
     {
+        Winner = false;
         Debug.Log("The game is a draw. There are no available spaces left");
+        StartCoroutine(EndGame());
+    }
+
+    IEnumerator EndGame()
+    {
+        yield return new WaitForSeconds(1.0f);
+
+        SceneManager.LoadScene("EndGame");
     }
 
     /// <summary>

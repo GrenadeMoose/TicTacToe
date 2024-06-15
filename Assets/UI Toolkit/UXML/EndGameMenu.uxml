@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/USS/MainButton.uss?fileID=7433441132597879392&amp;guid=8525e04f745475a44ab838ec5bfc5d59&amp;type=3#MainButton" />
+    <ui:VisualElement name="MainContainer" style="flex-grow: 1; margin-top: 30px; align-items: center; justify-content: flex-start; align-self: auto; min-width: 300px; min-height: 200px; height: 100%; width: 100%; max-width: 100%; max-height: 100%;">
+        <ui:VisualElement name="MenuContainer" style="flex-grow: 1; align-self: center; align-items: center; justify-content: center; padding-top: 0;">
+            <ui:Label tabindex="-1" text="Player Wins" parse-escape-sequences="true" display-tooltip-when-elided="true" name="WinText" style="padding-bottom: 30px; width: 100%; -unity-text-align: upper-center; -unity-font: url(&quot;project://database/Assets/UI%20Toolkit/Fonts/Roboto-Black.ttf?fileID=12800000&amp;guid=f5f17ecf9142f5e4eafd9e7f430cec29&amp;type=3#Roboto-Black&quot;); -unity-font-style: normal;" />
+            <ui:Button text="Main Menu" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Return" class="button" style="text-overflow: clip; width: 100%;" />
+            <ui:Button text="Exit" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ExitButton" class="button" style="width: 100%;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
