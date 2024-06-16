@@ -6,7 +6,10 @@ using UnityEngine.UIElements;
 
 public class EndMenuController : MonoBehaviour
 {
-    // Start is called before the first frame update
+    /// <summary>
+    /// On Enable
+    /// Set up the UI
+    /// </summary>
     private void OnEnable()
     {
         VisualElement baseComponent = GetComponent<UIDocument>().rootVisualElement;
@@ -21,10 +24,18 @@ public class EndMenuController : MonoBehaviour
         buttonQuit.clicked += () => Application.Quit();
     }
 
+    /// <summary>
+    /// Load the main menu
+    /// </summary>
     void LoadMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
     }
+
+    /// <summary>
+    /// Set the text of the winning condition.
+    /// </summary>
+    /// <param name="winText">The label that should receive text</param>
 
     void SetWinText(Label winText)
     {

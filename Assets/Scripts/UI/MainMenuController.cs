@@ -4,6 +4,10 @@ using UnityEngine.UIElements;
 
 public class MainMenuController : MonoBehaviour
 {
+    /// <summary>
+    /// On Enable
+    /// Set up the UI
+    /// </summary>
     private void OnEnable()
     {
         VisualElement baseComponent = GetComponent<UIDocument>().rootVisualElement;
@@ -19,12 +23,18 @@ public class MainMenuController : MonoBehaviour
         buttonQuit.clicked += () => Application.Quit();
     }
 
+    /// <summary>
+    /// Load a single player game
+    /// </summary>
     private void LoadSinglePlayerGame()
     {
         TicTacToeController.Instance.Multiplayer = false;
         SceneManager.LoadScene("TicTacToe");
     }
-
+    
+    /// <summary>
+    /// Load a multiplayer game
+    /// </summary>
     private void LoadMultiplayerGame()
     {
         TicTacToeController.Instance.Multiplayer = true;

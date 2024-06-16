@@ -37,7 +37,6 @@ public class BoardSpace : MonoBehaviour
     {
         if (!TicTacToeController.Instance.Multiplayer && !TicTacToeController.Instance.IsXTurn)
         {
-            Debug.Log("Not the player's turn");
             return;
         } else
         {
@@ -144,13 +143,11 @@ public class BoardSpace : MonoBehaviour
                 {
 
                     // Already assigned
-                    Debug.Log("Neighbor already assigned for " + this.gameObject.name + " > " + direction.ToString() + " > " + neighbor.gameObject.name);
                     return;
                 }
             }
         }
         
-        Debug.Log("Adding Neighbor " + this.gameObject.name + " > " + direction.ToString() + " > " + neighbor.gameObject.name);
         NeighboringSpace newNeighbor = new NeighboringSpace(neighbor, direction);
         Neighbors.Add(newNeighbor);
 
@@ -191,6 +188,11 @@ public class BoardSpace : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Check neighboring spaces to see if they have the same value
+    /// </summary>
+    /// <param name="direction">The direction from this space of the recursive search</param>
+    /// <returns>The total number of spaces that have the same value in a given direction</returns>
     public int CheckNeighbor(NeighboringSpace.DirectionEnum direction)
     {
         int count = 0;
@@ -210,6 +212,10 @@ public class BoardSpace : MonoBehaviour
         return count;
     }
 
+    /// <summary>
+    /// Set colors of neighboring spaces to Red, so that they may be visibly highlighted for the winning condition
+    /// </summary>
+    /// <param name="direction">The direction from this space, where colors should be recursively set.</param>
     private void SetNeighborColors(NeighboringSpace.DirectionEnum direction)
     {
         foreach(NeighboringSpace n in Neighbors)

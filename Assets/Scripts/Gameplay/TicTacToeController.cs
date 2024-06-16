@@ -62,7 +62,6 @@ public class TicTacToeController : MonoBehaviour
 
         Vector2 canvasSize = parentTransform.GetComponentInParent<Canvas>().GetComponent<RectTransform>().sizeDelta;
         float minParentSize = Mathf.Min(canvasSize.x, canvasSize.y);
-        Debug.Log(minParentSize);
         parentTransform.sizeDelta = new Vector2(minParentSize, minParentSize);
 
         float minWidth = parentTransform.rect.width / rowCount;
@@ -108,7 +107,6 @@ public class TicTacToeController : MonoBehaviour
         if (col > 0)
         {
             res.GetComponent<BoardSpace>().AssignNeighbor(AvailableSpaces.Last<GameObject>().GetComponent<BoardSpace>(), NeighboringSpace.DirectionEnum.Left);
-            Debug.Log(res.GetComponent<BoardSpace>().Neighbors.Count);
 
         }
         if (row > 0)
@@ -117,16 +115,13 @@ public class TicTacToeController : MonoBehaviour
             {
                 int upperLeftIndex = AvailableSpaces.Count - colCount - 1;
                 res.GetComponent<BoardSpace>().AssignNeighbor(AvailableSpaces[upperLeftIndex].GetComponent<BoardSpace>(), NeighboringSpace.DirectionEnum.UpperLeft);
-                Debug.Log(res.GetComponent<BoardSpace>().Neighbors.Count);
             }
             int topIndex = AvailableSpaces.Count - colCount;
             res.GetComponent<BoardSpace>().AssignNeighbor(AvailableSpaces[topIndex].GetComponent<BoardSpace>(), NeighboringSpace.DirectionEnum.Top);
-            Debug.Log(res.GetComponent<BoardSpace>().Neighbors.Count);
             if (col < colCount - 1)
             {
                 int upperRightIndex = AvailableSpaces.Count - colCount + 1;
                 res.GetComponent<BoardSpace>().AssignNeighbor(AvailableSpaces[upperRightIndex].GetComponent<BoardSpace>(), NeighboringSpace.DirectionEnum.UpperRight);
-                Debug.Log(res.GetComponent<BoardSpace>().Neighbors.Count);
             }
         }
         return res;
@@ -240,10 +235,13 @@ public class TicTacToeController : MonoBehaviour
     public void DrawGame()
     {
         Winner = false;
-        Debug.Log("The game is a draw. There are no available spaces left");
         StartCoroutine(EndGame());
     }
 
+    /// <summary>
+    /// End the game
+    /// Wait a second to let the player see where the winning condition was reached
+    /// </summary>
     IEnumerator EndGame()
     {
         yield return new WaitForSeconds(1.0f);
@@ -256,7 +254,6 @@ public class TicTacToeController : MonoBehaviour
     /// </summary>
     IEnumerator ComputerTurn()
     {
-        Debug.Log("Computer thinking");
         // Simulate computer thinking
         float seconds = Random.Range(0.5f, 2.0f);
         yield return new WaitForSeconds(seconds);
